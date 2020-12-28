@@ -1,7 +1,7 @@
 type NextNode<T>=Option<Box<ListNode<T>>>;
 
 #[derive(Debug)]
-struct ListNode<T> {
+pub struct ListNode<T> {
     value: T,
     next: NextNode<T>
 }
@@ -23,7 +23,14 @@ impl<T> ListNode<T> {
 }
 
 impl<T> LinkedList<T> {
-    fn from(node: NextNode<T>) -> Self {
+    pub fn new() -> Self {
+        LinkedList { 
+            head: None,
+            tail: None,
+            length: 0
+        }
+    }
+    pub fn from(node: NextNode<T>) -> Self {
         match node {
             None => {
                 LinkedList { 
