@@ -1,19 +1,21 @@
+type NextNode<T>=Option<Box<ListNode<T>>>;
+
 #[derive(Debug)]
-struct LinkedNode<T> {
+struct ListNode<T> {
     value: T,
-    next: Option<Box<LinkedNode<T>>>
+    next: NextNode<T>
 }
 
 #[derive(Debug)]
 pub struct LinkedList<T> {
     pub length: u64,
-    head: Option<Box<LinkedNode<T>>>,
-    // tail: Option<Box<LinkedNode<T>>>,
+    head: NextNode<T>,
+    tail: NextNode<T>,
 }
 
-impl<T> LinkedNode<T> {
-    fn new(value: T, next: Option<Box<LinkedNode<T>>>) -> LinkedNode<T> {
-        LinkedNode {
+impl<T> ListNode<T> {
+    fn new(value: T, next: NextNode<T>) -> ListNode<T> {
+        ListNode {
             value,
             next
         }
@@ -21,17 +23,19 @@ impl<T> LinkedNode<T> {
 }
 
 impl<T> LinkedList<T> {
-    fn new(node: Option<Box<LinkedNode<T>>>) -> LinkedList<T> {
+    fn from(node: NextNode<T>) -> Self {
         match node {
             None => {
                 LinkedList { 
                     head: None,
+                    tail: None,
                     length: 0
                 }
             }
             _ => {
                 LinkedList { 
                     head: node,
+                    tail: None,
                     length: 1
                 }
             },
@@ -40,9 +44,9 @@ impl<T> LinkedList<T> {
 }
 
 fn main() {
-    let linked_node=LinkedNode::new(1, Option::None);
-    let linked_list=LinkedList::new(Option::from(Box::from(linked_node)));
-    let empty_list: LinkedList<u32>=LinkedList::new(None);
+    let linked_node=ListNode::new(1, None);
+    let linked_list=LinkedList::from(Some(Box::from(linked_node)));
+    let empty_list: LinkedList<u32>=LinkedList::from(None);
     println!("Populated LinkedList instance: {:#?}", linked_list);
     println!("Empty LinkedList instance: {:#?}", empty_list);
 }
