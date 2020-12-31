@@ -1,60 +1,54 @@
 use std::mem;
 
-type NextNode<T>=Box<ListNode<T>>;
-
-#[derive(Debug)]
-enum Link<T> {
-    Empty,
-    More(NextNode<T>),
-}
+type NextNode<T>=Option<Box<ListNode<T>>>;
 
 #[derive(Debug)]
 pub struct ListNode<T> {
     value: T,
-    next: Link<T>
+    next: NextNode<T>
 }
 
 #[derive(Debug)]
 pub struct LinkedList<T> {
     pub length: u64,
-    head: Link<T>,
+    head: NextNode<T>,
 }
 
 impl<T> LinkedList<T> {
     pub fn new() -> Self {
         LinkedList { 
-            head: Link::Empty,
+            head: None,
             length: 0
         }
     }
-    fn from(node: Link<T>) -> Self {
+    fn from(node: Option<ListNode<T>>) -> Self {
         match node {
-            Link::Empty => {
+            None => {
                 LinkedList { 
-                    head: Link::Empty,
+                    head: None,
                     length: 0
                 }
             }
-            _ => {
+            Some(listnode) => {
                 LinkedList { 
-                    head: node,
+                    head: Some(Box::new(listnode)),
                     length: 1
                 }
             },
         }
     }
     pub fn push(&mut self, value: T) {
-        let new_node = Box::new( ListNode {
+        let new_node = Box::new(ListNode {
             value,
-            next: mem::replace(&mut self.head, Link::Empty)
+            next: mem::replace(&mut self.head, None)
         });
-        self.head = Link::More(new_node);
+        self.head = Some(new_node);
     }
 
     pub fn pop(&mut self) -> Option<T> {
-        match mem::replace(&mut self.head, Link::Empty) {
-            Link::Empty => None,
-            Link::More(node) => {
+        match mem::replace(&mut self.head, None) {
+            None => None,
+            Some(node) => {
                 self.head = node.next;
                 Some(node.value)
             }
@@ -67,15 +61,14 @@ mod tests {
     use super::*;
     #[test]
     fn basics() {
-        let node=Box::new(ListNode{ value: "1", next: Link::Empty});
-        let link=Link::More(node);
+        let node=ListNode{ value: "1", next: None};
 
-        let mut empty_list: LinkedList<&str>=LinkedList::from(Link::Empty);
+        let mut empty_list: LinkedList<&str>=LinkedList::from(None);
 
         // Test empty list pop behaviour
         assert_eq!(empty_list.pop(), None);
         // Test adding pre-existing node elements using from
-        let mut linked_list=LinkedList::from(link);
+        let mut linked_list=LinkedList::from(Some(node));
         let mut mutable_list = empty_list;
 
         mutable_list.push("1");
