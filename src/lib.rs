@@ -1,5 +1,3 @@
-use std::mem;
-
 type NextNode<T> = Option<Box<ListNode<T>>>;
 
 #[derive(Debug)]
@@ -36,13 +34,13 @@ impl<T> LinkedList<T> {
     pub fn push(&mut self, value: T) {
         let new_node = Box::new(ListNode {
             value,
-            next: mem::replace(&mut self.head, None),
+            next: self.head.take(),
         });
         self.head = Some(new_node);
     }
 
     pub fn pop(&mut self) -> Option<T> {
-        match mem::replace(&mut self.head, None) {
+        match self.head.take() {
             None => None,
             Some(node) => {
                 self.head = node.next;
