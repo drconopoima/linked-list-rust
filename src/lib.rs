@@ -116,9 +116,32 @@ impl<'a, T> Iterator for Iter<'a, T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.next.map(|node| {
+        self.next.take().map(|node| {
             self.next = node.next.as_ref().map::<&ListNode<T>, _>(|node| &**node);
             &node.value
+        })
+    }
+}
+
+pub struct IterMut<'a, T> {
+    next: Option<&'a mut ListNode<T>>,
+}
+
+impl<T> LinkedList<T> {
+    pub fn iter_mut<'a>(&'a mut self) -> IterMut<'a, T> {
+        IterMut {
+            next: self.head.as_mut().map(|node| &mut **node),
+        }
+    }
+}
+
+impl<'a, T> Iterator for IterMut<'a, T> {
+    type Item = &'a mut T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.take().map(|node| {
+            self.next = node.next.as_mut().map(|node| &mut **node);
+            &mut node.value
         })
     }
 }
@@ -201,5 +224,20 @@ mod tests {
         assert_eq!(iter.next(), Some(&None));
         assert_eq!(iter.next(), Some(&Some(Vec::new())));
         assert_eq!(iter.next(), None);
+    }
+    #[test]
+    fn iter_mut() {
+        let mut list = LinkedList::new();
+        list.push(String::from("1"));
+        list.push(String::from("2"));
+        list.push(String::from("3"));
+        let mut iter_mut = list.iter_mut();
+        assert_eq!(&iter_mut.next().unwrap()[..], "3");
+        iter_mut.next().map(|value| *value = String::from("42"));
+        assert_eq!(&iter_mut.next().unwrap()[..], "1");
+        assert_eq!(&iter_mut.next(), &None);
+        assert_eq!(&list.pop().unwrap()[..],"3");
+        assert_eq!(&list.pop().unwrap()[..],"42");
+        assert_eq!(&list.pop().unwrap()[..],"1");
     }
 }
