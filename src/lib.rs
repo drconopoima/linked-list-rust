@@ -51,7 +51,7 @@ impl<T> LinkedList<T> {
         self.length += 1;
     }
     // Removes the first value at the start of the list.
-    // @returns {Option<T>} The value deleted from the list.
+    // @returns {Option<T>} the value deleted from the list.
     pub fn pop(&mut self) -> Option<T> {
         self.head.take().map(|node| {
             self.head = node.next;
@@ -59,6 +59,20 @@ impl<T> LinkedList<T> {
             node.value
         })
     }
+    // Show first value at the start of the list.
+    // @returns {Option<&T>} reference to list's head value
+    pub fn peek(&self) -> Option<&T> {
+        self.head.as_ref().map(|node| {
+            &node.value
+        })
+    }
+    // Return mut reference to first value at the start of the list.
+    // @returns {Option<&T>} mut reference to list's head value
+    pub fn peek_mut(&mut self) -> Option<&mut T> {
+        self.head.as_mut().map(|node| {
+            &mut node.value
+        })
+    }    
 }
 
 impl<T> Drop for LinkedList<T> {
@@ -119,5 +133,20 @@ mod tests {
         assert_eq!(list.pop(), Some(1));
         assert_eq!(list.pop(), None);
         assert_eq!(list.length, 0);
+    }
+    #[test]
+    fn peek() {
+        let mut list: LinkedList<usize> = LinkedList::new();
+        assert_eq!(list.peek(), None);
+        assert_eq!(list.peek_mut(), None);
+        list.push(1);
+        list.push(2);
+        assert_eq!(list.peek(), Some(&2));
+        assert_eq!(list.peek_mut(), Some(&mut 2));
+        list.peek_mut().map(|value| {
+            *value = 0
+        });
+        assert_eq!(list.peek(), Some(&0));
+        assert_eq!(list.pop(), Some(0));
     }
 }
