@@ -8,17 +8,26 @@ pub struct ListNode<T> {
 
 #[derive(Debug)]
 pub struct LinkedList<T> {
-    pub length: u64,
+    // Number of non-empty nodes in list
+    // @field length
+    // @type {usize}
+    pub length: usize,
+    // Pointer to first node in the list.
+    // @field head
+    // @type {Option<Box<ListNode<T>>>}
     head: NextNode<T>,
 }
 
 impl<T> LinkedList<T> {
+    // Creates a new empty instance of LinkedList
     pub fn new() -> Self {
         LinkedList {
             head: None,
             length: 0,
         }
     }
+    // Creates a new instance of LinkedList from an existing ListNode
+    // @param {node: Option<ListNode<T>>} initial node to build list.
     pub fn from(node: Option<ListNode<T>>) -> Self {
         match node {
             None => LinkedList {
@@ -31,6 +40,8 @@ impl<T> LinkedList<T> {
             },
         }
     }
+    // Inserts some value at the start of the list.
+    // @param {value: <T>} the data to add to the list.
     pub fn push(&mut self, value: T) {
         let new_node = Box::new(ListNode {
             value,
@@ -39,7 +50,8 @@ impl<T> LinkedList<T> {
         self.head = Some(new_node);
         self.length += 1;
     }
-
+    // Removes the first value at the start of the list.
+    // @returns {Option<T>} The value deleted from the list.
     pub fn pop(&mut self) -> Option<T> {
         self.head.take().map(|node| {
             self.head = node.next;
