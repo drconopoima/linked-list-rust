@@ -62,17 +62,13 @@ impl<T> LinkedList<T> {
     // Show first value at the start of the list.
     // @returns {Option<&T>} reference to list's head value
     pub fn peek(&self) -> Option<&T> {
-        self.head.as_ref().map(|node| {
-            &node.value
-        })
+        self.head.as_ref().map(|node| &node.value)
     }
     // Return mut reference to first value at the start of the list.
     // @returns {Option<&T>} mut reference to list's head value
     pub fn peek_mut(&mut self) -> Option<&mut T> {
-        self.head.as_mut().map(|node| {
-            &mut node.value
-        })
-    }    
+        self.head.as_mut().map(|node| &mut node.value)
+    }
 }
 
 impl<T> Drop for LinkedList<T> {
@@ -104,14 +100,14 @@ impl<T> Iterator for IntoIter<T> {
     }
 }
 
-pub struct Iter<'a, T>{
-    next: Option<&'a ListNode<T>>
+pub struct Iter<'a, T> {
+    next: Option<&'a ListNode<T>>,
 }
 
 impl<T> LinkedList<T> {
     pub fn iter<'a>(&'a self) -> Iter<'a, T> {
         Iter {
-            next: self.head.as_ref().map(|node| &**node)
+            next: self.head.as_ref().map(|node| &**node),
         }
     }
 }
@@ -182,9 +178,7 @@ mod tests {
         list.push(2);
         assert_eq!(list.peek(), Some(&2));
         assert_eq!(list.peek_mut(), Some(&mut 2));
-        list.peek_mut().map(|value| {
-            *value = 0
-        });
+        list.peek_mut().map(|value| *value = 0);
         assert_eq!(list.peek(), Some(&0));
         assert_eq!(list.pop(), Some(0));
     }
