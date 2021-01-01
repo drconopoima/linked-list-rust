@@ -49,6 +49,19 @@ impl<T> LinkedList<T> {
     }
 }
 
+impl<T> Drop for LinkedList<T> {
+    fn drop(&mut self) {
+        let mut current_link = self.head.take();
+
+        while let Some(mut boxed_node) = current_link {
+            current_link = boxed_node.next.take();
+            // boxed_node goes out of scope and gets dropped here;
+            // but its Node's `next` field has been set to None by
+            // take() method, so no unbounded recursion occurs.
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
