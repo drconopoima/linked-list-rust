@@ -88,6 +88,22 @@ impl<T> Drop for LinkedList<T> {
     }
 }
 
+pub struct IntoIter<T>(LinkedList<T>);
+
+impl<T> LinkedList<T> {
+    pub fn into_iter(self) -> IntoIter<T> {
+        IntoIter(self)
+    }
+}
+
+impl<T> Iterator for IntoIter<T> {
+    type Item = T;
+    fn next(&mut self) -> Option<Self::Item> {
+        // Element 0 of IntoIter Tuple Struct is LinkedList<T>
+        self.0.pop()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -148,5 +164,15 @@ mod tests {
         });
         assert_eq!(list.peek(), Some(&0));
         assert_eq!(list.pop(), Some(0));
+    }
+    #[test]
+    fn into_iter() {
+        let mut list: LinkedList<f32> = LinkedList::new();
+        list.push(1.0);
+        list.push(2.0);
+        let mut iter = list.into_iter();
+        assert_eq!(iter.next(), Some(2.0));
+        assert_eq!(iter.next(), Some(1.0));
+        assert_eq!(iter.next(), None);
     }
 }
