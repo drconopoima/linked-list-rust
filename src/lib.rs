@@ -104,6 +104,29 @@ impl<T> Iterator for IntoIter<T> {
     }
 }
 
+pub struct Iter<'a, T>{
+    next: Option<&'a ListNode<T>>
+}
+
+impl<T> LinkedList<T> {
+    pub fn iter<'a>(&'a self) -> Iter<'a, T> {
+        Iter {
+            next: self.head.as_ref().map(|node| &**node)
+        }
+    }
+}
+
+impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.map(|node| {
+            self.next = node.next.as_ref().map::<&ListNode<T>, _>(|node| &**node);
+            &node.value
+        })
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -173,6 +196,16 @@ mod tests {
         let mut iter = list.into_iter();
         assert_eq!(iter.next(), Some(2.0));
         assert_eq!(iter.next(), Some(1.0));
+        assert_eq!(iter.next(), None);
+    }
+    #[test]
+    fn iter() {
+        let mut list: LinkedList<Option<Vec<i32>>> = LinkedList::new();
+        list.push(Some(Vec::new()));
+        list.push(None);
+        let mut iter = list.iter();
+        assert_eq!(iter.next(), Some(&None));
+        assert_eq!(iter.next(), Some(&Some(Vec::new())));
         assert_eq!(iter.next(), None);
     }
 }
