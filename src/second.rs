@@ -236,8 +236,8 @@ mod tests {
         iter_mut.next().map(|value| *value = String::from("42"));
         assert_eq!(&iter_mut.next().unwrap()[..], "1");
         assert_eq!(&iter_mut.next(), &None);
-        assert_eq!(&list.pop().unwrap()[..],"3");
-        assert_eq!(&list.pop().unwrap()[..],"42");
-        assert_eq!(&list.pop().unwrap()[..],"1");
+        assert_eq!(&list.pop().unwrap()[..], "3");
+        assert_eq!(&list.pop().unwrap()[..], "42");
+        assert_eq!(&list.pop().unwrap()[..], "1");
     }
 }

@@ -1,11 +1,11 @@
 use std::rc::Rc;
 
-type NextNode<T>=Option<Rc<ListNode<T>>>;
+type NextNode<T> = Option<Rc<ListNode<T>>>;
 
 #[derive(Debug)]
 pub struct ListNode<T> {
     value: T,
-    next: NextNode<T>
+    next: NextNode<T>,
 }
 
 #[derive(Debug)]
@@ -17,5 +17,5 @@ pub struct LinkedList<T> {
     // Pointer to first node in the list.
     // @field head
     // @type {Option<Box<ListNode<T>>>}
-    head: ListNode<T>
+    head: ListNode<T>,
 }
