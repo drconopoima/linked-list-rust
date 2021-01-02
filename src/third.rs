@@ -3,7 +3,7 @@ use std::rc::Rc;
 type NextNode<T> = Option<Rc<ListNode<T>>>;
 
 #[derive(Debug)]
-pub struct ListNode<T> {
+struct ListNode<T> {
     value: T,
     next: NextNode<T>,
 }
@@ -17,5 +17,11 @@ pub struct LinkedList<T> {
     // Pointer to first node in the list.
     // @field head
     // @type {Option<Box<ListNode<T>>>}
-    head: ListNode<T>,
+    head: NextNode<T>,
+}
+
+impl<T> LinkedList<T> {
+    pub fn new() -> Self {
+        LinkedList { head: None, length: 0 }
+    }
 }
