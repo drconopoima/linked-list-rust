@@ -50,4 +50,49 @@ impl<T> LinkedList<T> {
             }
         }
     }
+    pub fn pop_front(&mut self) -> Option<T> {
+        self.head.take().map(|old_head| {
+            match old_head.borrow_mut().next.take() {
+                Some(new_head) => {
+                    new_head.borrow_mut().prev.take();
+                    self.head = Some(new_head);
+                    self.length -= 1;
+                }
+                None => {
+                    self.tail.take();
+                    self.length -= 1;
+                }
+            }
+            Rc::try_unwrap(old_head).ok().unwrap().into_inner().value
+        })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::LinkedList;
+    #[test]
+    fn basics() {
+        let mut list = LinkedList::new();
+
+        // Check empty list behaves right
+        assert_eq!(list.pop_front(), None);
+
+        // Populate list
+        list.push_front(1);
+        list.push_front(2);
+        list.push_front(3);
+
+        // Check normal removal
+        assert_eq!(list.pop_front(), Some(3));
+        assert_eq!(list.pop_front(), Some(2));
+
+        // Push some more just to make sure nothing's corrupted
+        list.push_front(4);
+        // Check normal removal
+        assert_eq!(list.pop_front(), Some(4));
+        // Check exhaustion
+        assert_eq!(list.pop_front(), Some(1));
+        assert_eq!(list.pop_front(), None);
+    }
 }
