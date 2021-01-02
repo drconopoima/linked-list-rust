@@ -22,6 +22,9 @@ pub struct LinkedList<T> {
 
 impl<T> LinkedList<T> {
     pub fn new() -> Self {
-        LinkedList { head: None, length: 0 }
+        LinkedList {
+            head: None,
+            length: 0,
+        }
     }
 }
