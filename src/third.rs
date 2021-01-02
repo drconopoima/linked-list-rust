@@ -52,3 +52,22 @@ impl<T> LinkedList<T> {
         self.head.as_ref().map(|node| &node.value)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::LinkedList;
+    #[test]
+    fn basics() {
+        let list: LinkedList<u32> = LinkedList::new();
+        assert_eq!(list.head(), None);
+        let list = list.append(1).append(2);
+        assert_eq!(list.head(), Some(&2));
+        let list = list.tail();
+        assert_eq!(list.head(), Some(&1));
+        let list = list.tail();
+        assert_eq!(list.head(), None);
+        // Make sure empty tail works
+        let list = list.tail();
+        assert_eq!(list.head(), None);
+    }
+}
