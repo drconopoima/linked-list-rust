@@ -84,6 +84,22 @@ impl<T> LinkedList<T> {
             }
         }
     }
+    pub fn pop_back(&mut self) -> Option<T> {
+        self.tail.take().map(|old_tail| {
+            match old_tail.borrow_mut().prev.take() {
+                Some(new_tail) => {
+                    new_tail.borrow_mut().next.take();
+                    self.tail = Some(new_tail);
+                    self.length -= 1;
+                }
+                None => {
+                    self.head.take();
+                    self.length -= 1;
+                }
+            }
+            Rc::try_unwrap(old_tail).ok().unwrap().into_inner().value
+        })
+    }
 }
 
 impl<T> Drop for LinkedList<T> {
@@ -102,11 +118,15 @@ mod test {
         // Check empty list behaves right
         assert_eq!(list.pop_front(), None);
 
-        // Populate list
+        // Populate list from front
         list.push_front(1);
         list.push_front(2);
+        // Populate list from back
         list.push_back(3);
-
+        list.push_back(4);
+        assert_eq!(list.length, 4);
+        assert_eq!(list.pop_back(), Some(4));
+        assert_eq!(list.length, 3);
         // Check normal removal
         assert_eq!(list.pop_front(), Some(2));
         assert_eq!(list.pop_front(), Some(1));
@@ -117,6 +137,10 @@ mod test {
         assert_eq!(list.pop_front(), Some(4));
         // Check exhaustion
         assert_eq!(list.pop_front(), Some(3));
+        assert_eq!(list.length, 0);
         assert_eq!(list.pop_front(), None);
+        assert_eq!(list.length, 0);
+        assert_eq!(list.pop_back(), None);
+        assert_eq!(list.length, 0);
     }
 }
