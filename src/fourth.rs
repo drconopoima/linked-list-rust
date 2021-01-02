@@ -68,6 +68,12 @@ impl<T> LinkedList<T> {
     }
 }
 
+impl<T> Drop for LinkedList<T> {
+    fn drop(&mut self) {
+        while self.pop_front().is_some() {}
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::LinkedList;
