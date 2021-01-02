@@ -66,6 +66,24 @@ impl<T> LinkedList<T> {
             Rc::try_unwrap(old_head).ok().unwrap().into_inner().value
         })
     }
+    pub fn push_back(&mut self, value: T) {
+        let new_tail = ListNode::new(value);
+        match self.tail.take() {
+            None => {
+                // empty-list, need to set the head
+                self.head = Some(new_tail.clone());
+                self.tail = Some(new_tail);
+                self.length += 1;
+            }
+            Some(old_tail) => {
+                // non-empty list, need to connect the old_tail
+                old_tail.borrow_mut().next = Some(new_tail.clone());
+                new_tail.borrow_mut().prev = Some(old_tail);
+                self.tail = Some(new_tail);
+                self.length += 1;
+            }
+        }
+    }
 }
 
 impl<T> Drop for LinkedList<T> {
@@ -87,18 +105,18 @@ mod test {
         // Populate list
         list.push_front(1);
         list.push_front(2);
-        list.push_front(3);
+        list.push_back(3);
 
         // Check normal removal
-        assert_eq!(list.pop_front(), Some(3));
         assert_eq!(list.pop_front(), Some(2));
+        assert_eq!(list.pop_front(), Some(1));
 
         // Push some more just to make sure nothing's corrupted
         list.push_front(4);
         // Check normal removal
         assert_eq!(list.pop_front(), Some(4));
         // Check exhaustion
-        assert_eq!(list.pop_front(), Some(1));
+        assert_eq!(list.pop_front(), Some(3));
         assert_eq!(list.pop_front(), None);
     }
 }
