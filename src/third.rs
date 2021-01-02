@@ -53,6 +53,28 @@ impl<T> LinkedList<T> {
     }
 }
 
+pub struct Iter<'a, T> {
+    next: Option<&'a ListNode<T>>,
+}
+impl<T> LinkedList<T> {
+    pub fn iter(&self) -> Iter<'_, T> {
+        Iter {
+            next: self.head.as_ref().map(|node| &**node),
+        }
+    }
+}
+
+impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.map(|node| {
+            self.next = node.next.as_ref().map(|node| &**node);
+            &node.value
+        })
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::LinkedList;
@@ -69,5 +91,14 @@ mod test {
         // Make sure empty tail works
         let list = list.tail();
         assert_eq!(list.head(), None);
+    }
+    #[test]
+    fn iter() {
+        let list: LinkedList<Option<Vec<i32>>> =
+            LinkedList::new().append(Some(Vec::new())).append(None);
+        let mut iter = list.iter();
+        assert_eq!(iter.next(), Some(&None));
+        assert_eq!(iter.next(), Some(&Some(Vec::new())));
+        assert_eq!(iter.next(), None);
     }
 }
