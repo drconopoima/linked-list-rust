@@ -131,6 +131,27 @@ impl<T> Drop for LinkedList<T> {
     }
 }
 
+pub struct IntoIter<T>(LinkedList<T>);
+
+impl<T> LinkedList<T> {
+    pub fn into_iter(self) -> IntoIter<T> {
+        IntoIter(self)
+    }
+}
+
+impl<T> Iterator for IntoIter<T> {
+    type Item = T;
+    fn next(&mut self) -> Option<T> {
+        self.0.pop_front()
+    }
+}
+
+impl<T> DoubleEndedIterator for IntoIter<T> {
+    fn next_back(&mut self) -> Option<T> {
+        self.0.pop_back()
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::LinkedList;
@@ -181,5 +202,18 @@ mod test {
         assert_eq!(&*list.peek_front_mut().unwrap(), &mut 3);
         assert_eq!(&*list.peek_back().unwrap(), &1);
         assert_eq!(&*list.peek_back_mut().unwrap(), &mut 1);
+    }
+    #[test]
+    fn into_iter() {
+        let mut list = LinkedList::new();
+        list.push_front(1.0);
+        list.push_front(2.0);
+        list.push_back(3.0);
+        let mut iter = list.into_iter();
+        assert_eq!(iter.next(), Some(2.0));
+        assert_eq!(iter.next_back(), Some(3.0));
+        assert_eq!(iter.next(), Some(1.0));
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next_back(), None);
     }
 }
