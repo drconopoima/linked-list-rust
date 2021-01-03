@@ -1,4 +1,7 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{
+    cell::{Ref, RefCell},
+    rc::Rc,
+};
 
 type Link<T> = Option<Rc<RefCell<ListNode<T>>>>;
 
@@ -100,6 +103,16 @@ impl<T> LinkedList<T> {
             Rc::try_unwrap(old_tail).ok().unwrap().into_inner().value
         })
     }
+    pub fn peek_front(&self) -> Option<Ref<T>> {
+        self.head
+            .as_ref()
+            .map(|node| Ref::map(node.borrow(), |node| &node.value))
+    }
+    pub fn peek_back(&self) -> Option<Ref<T>> {
+        self.tail
+            .as_ref()
+            .map(|node| Ref::map(node.borrow(), |node| &node.value))
+    }
 }
 
 impl<T> Drop for LinkedList<T> {
@@ -142,5 +155,16 @@ mod test {
         assert_eq!(list.length, 0);
         assert_eq!(list.pop_back(), None);
         assert_eq!(list.length, 0);
+    }
+    #[test]
+    fn peek() {
+        let mut list = LinkedList::new();
+        assert!(list.peek_front().is_none());
+        list.push_front(1);
+        list.push_front(2);
+        list.push_front(3);
+
+        assert_eq!(&*list.peek_front().unwrap(), &3);
+        assert_eq!(&*list.peek_back().unwrap(), &1);
     }
 }
