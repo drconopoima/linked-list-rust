@@ -1,5 +1,5 @@
 use std::{
-    cell::{Ref, RefCell},
+    cell::{Ref, RefCell, RefMut},
     rc::Rc,
 };
 
@@ -113,6 +113,16 @@ impl<T> LinkedList<T> {
             .as_ref()
             .map(|node| Ref::map(node.borrow(), |node| &node.value))
     }
+    pub fn peek_back_mut(&mut self) -> Option<RefMut<T>> {
+        self.tail
+            .as_ref()
+            .map(|node| RefMut::map(node.borrow_mut(), |node| &mut node.value))
+    }
+    pub fn peek_front_mut(&mut self) -> Option<RefMut<T>> {
+        self.head
+            .as_ref()
+            .map(|node| RefMut::map(node.borrow_mut(), |node| &mut node.value))
+    }
 }
 
 impl<T> Drop for LinkedList<T> {
@@ -160,11 +170,16 @@ mod test {
     fn peek() {
         let mut list = LinkedList::new();
         assert!(list.peek_front().is_none());
+        assert!(list.peek_back().is_none());
+        assert!(list.peek_front_mut().is_none());
+        assert!(list.peek_back_mut().is_none());
         list.push_front(1);
         list.push_front(2);
         list.push_front(3);
 
         assert_eq!(&*list.peek_front().unwrap(), &3);
+        assert_eq!(&*list.peek_front_mut().unwrap(), &mut 3);
         assert_eq!(&*list.peek_back().unwrap(), &1);
+        assert_eq!(&*list.peek_back_mut().unwrap(), &mut 1);
     }
 }
